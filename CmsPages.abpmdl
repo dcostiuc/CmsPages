@@ -1,0 +1,101 @@
+{
+  "template": "app",
+  "imports": {
+    "Volo.Abp.BasicTheme": {
+      "version": "9.1.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.Account": {
+      "version": "9.1.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.OpenIddict": {
+      "version": "9.1.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.Identity": {
+      "version": "9.1.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.TenantManagement": {
+      "version": "9.1.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.SettingManagement": {
+      "version": "9.1.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.PermissionManagement": {
+      "version": "9.1.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.FeatureManagement": {
+      "version": "9.1.0",
+      "isInstalled": true
+    }
+  },
+  "folders": {
+    "items": {
+      "src": {},
+      "test": {}
+    }
+  },
+  "packages": {
+    "CmsPages.Application": {
+      "path": "src/CmsPages.Application/CmsPages.Application.abppkg",
+      "folder": "src"
+    },
+    "CmsPages.Application.Tests": {
+      "path": "test/CmsPages.Application.Tests/CmsPages.Application.Tests.abppkg",
+      "folder": "test"
+    },
+    "CmsPages.Domain.Shared": {
+      "path": "src/CmsPages.Domain.Shared/CmsPages.Domain.Shared.abppkg",
+      "folder": "src"
+    },
+    "CmsPages.Application.Contracts": {
+      "path": "src/CmsPages.Application.Contracts/CmsPages.Application.Contracts.abppkg",
+      "folder": "src"
+    },
+    "CmsPages.HttpApi": {
+      "path": "src/CmsPages.HttpApi/CmsPages.HttpApi.abppkg",
+      "folder": "src"
+    },
+    "CmsPages.HttpApi.Client": {
+      "path": "src/CmsPages.HttpApi.Client/CmsPages.HttpApi.Client.abppkg",
+      "folder": "src"
+    },
+    "CmsPages.EntityFrameworkCore.Tests": {
+      "path": "test/CmsPages.EntityFrameworkCore.Tests/CmsPages.EntityFrameworkCore.Tests.abppkg",
+      "folder": "test"
+    },
+    "CmsPages.EntityFrameworkCore": {
+      "path": "src/CmsPages.EntityFrameworkCore/CmsPages.EntityFrameworkCore.abppkg",
+      "folder": "src"
+    },
+    "CmsPages.TestBase": {
+      "path": "test/CmsPages.TestBase/CmsPages.TestBase.abppkg",
+      "folder": "test"
+    },
+    "CmsPages.Domain.Tests": {
+      "path": "test/CmsPages.Domain.Tests/CmsPages.Domain.Tests.abppkg",
+      "folder": "test"
+    },
+    "CmsPages.HttpApi.Client.ConsoleTestApp": {
+      "path": "test/CmsPages.HttpApi.Client.ConsoleTestApp/CmsPages.HttpApi.Client.ConsoleTestApp.abppkg",
+      "folder": "test"
+    },
+    "CmsPages.DbMigrator": {
+      "path": "src/CmsPages.DbMigrator/CmsPages.DbMigrator.abppkg",
+      "folder": "src"
+    },
+    "CmsPages.Blazor": {
+      "path": "src/CmsPages.Blazor/CmsPages.Blazor.abppkg",
+      "folder": "src"
+    },
+    "CmsPages.Domain": {
+      "path": "src/CmsPages.Domain/CmsPages.Domain.abppkg",
+      "folder": "src"
+    }
+  }
+}

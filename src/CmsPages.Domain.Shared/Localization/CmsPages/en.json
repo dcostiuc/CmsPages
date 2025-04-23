@@ -1,0 +1,28 @@
+{
+  "Culture": "en",
+  "Texts": {
+    "AppName": "CmsPages",
+    "Menu:Pages": "Pages",
+    "Actions": "Actions",
+    "Close": "Close",
+    "Delete": "Delete",
+    "Edit": "Edit",
+    "PublishDate": "Publish date",
+    "NewPage": "New page",
+    "Name": "Name",
+    "Type": "Type",
+    "Price": "Price",
+    "CreationTime": "Creation time",
+    "AreYouSure": "Are you sure?",
+    "AreYouSureToDelete": "Are you sure you want to delete this item?",
+    "SuccessfullyDeleted": "Successfully deleted!",
+    "Permission:Pages": "Page",
+    "Permission:Pages.Create": "Creating new pages",
+    "Permission:Pages.Edit": "Editing the pages",
+    "Permission:Pages.Delete": "Deleting the pages",
+    "Menu:Home": "Home",
+    "LongWelcomeMessage": "Welcome to the application. This is a startup project based on the ABP framework. For more information visit",
+    "Welcome": "Welcome",
+    "RouteName": "Route"
+  }
+}

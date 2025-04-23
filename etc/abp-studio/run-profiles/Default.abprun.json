@@ -1,0 +1,15 @@
+﻿{
+  "applications": {
+    "CmsPages.Blazor": {
+      "type": "dotnet-project",
+      "launchUrl": "https://localhost:44329",
+      "path": "../../../src/CmsPages.Blazor/CmsPages.Blazor.csproj",
+      "kubernetesService": ".*-blazorserver$",
+      "healthCheckEndpoint": "/health-status",
+      "healthUiEndpoint": "/health-ui",
+      "execution": {
+        "order": 2
+      }
+}
+  }
+}

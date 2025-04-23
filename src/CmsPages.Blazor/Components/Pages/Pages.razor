@@ -1,0 +1,165 @@
+﻿@page "/pages"
+@attribute [Authorize(CmsPagesPermissions.Pages.Default)]
+@using CmsPages.Permissions
+@using Volo.Abp.Application.Dtos
+@using CmsPages.Pages
+@using CmsPages.Localization
+@using Blazorise
+@using Microsoft.Extensions.Localization
+@using Volo.Abp.AspNetCore.Components.Web
+@inject IStringLocalizer<CmsPagesResource> L
+@inject AbpBlazorMessageLocalizerHelper<CmsPagesResource> LH
+@inherits AbpCrudPageBase<IPageAppService, PageDto, Guid, PagedAndSortedResultRequestDto, CreateUpdatePageDto>
+
+<Card>
+    <CardHeader>
+        <Row Class="justify-content-between">
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <h2>@L["Pages"]</h2>
+            </Column>
+            <Column ColumnSize="ColumnSize.IsAuto">
+                @if (HasCreatePermission)
+                {
+                    <Button Color="Color.Primary" Clicked="OpenCreateModalAsync">@L["NewPage"]</Button>
+                }
+            </Column>
+        </Row>
+    </CardHeader>
+    <CardBody>
+        <DataGrid TItem="PageDto" Data="Entities" ReadData="OnDataGridReadAsync" CurrentPage="CurrentPage"
+            TotalItems="TotalCount" ShowPager="true" PageSize="PageSize">
+            <DataGridColumns>
+                <DataGridEntityActionsColumn TItem="PageDto" @ref="@EntityActionsColumn">
+                    <DisplayTemplate>
+                        <EntityActions TItem="PageDto" EntityActionsColumn="@EntityActionsColumn">
+                            <EntityAction TItem="PageDto" Text="@L["Edit"]" Visible=HasUpdatePermission
+                                Clicked="() => OpenEditModalAsync(context)" />
+                            <EntityAction TItem="PageDto" Text="@L["Delete"]" Visible=HasDeletePermission
+                                Clicked="() => DeleteEntityAsync(context)"
+                                ConfirmationMessage="() => GetDeleteConfirmationMessage(context)" />
+                        </EntityActions>
+                    </DisplayTemplate>
+                </DataGridEntityActionsColumn>
+                <DataGridColumn TItem="PageDto" Field="@nameof(PageDto.Title)" Caption="@L["Title"]"></DataGridColumn>
+                <DataGridColumn TItem="PageDto" Field="@nameof(PageDto.RouteName)" Caption="@L["RouteName"]">
+                </DataGridColumn>
+                <DataGridColumn TItem="PageDto" Field="@nameof(PageDto.IsHomePage)" Caption="@L["IsHomePage"]">
+                </DataGridColumn>
+                <DataGridColumn TItem="PageDto" Field="@nameof(PageDto.CreationTime)" Caption="@L["CreationTime"]">
+                    <DisplayTemplate>
+                        @context.CreationTime.ToLongDateString()
+                    </DisplayTemplate>
+                </DataGridColumn>
+            </DataGridColumns>
+        </DataGrid>
+    </CardBody>
+</Card>
+
+<Modal @ref="@CreateModal">
+    <ModalBackdrop />
+    <ModalContent IsCentered="true">
+        <Form>
+            <ModalHeader>
+                <ModalTitle>@L["NewPage"]</ModalTitle>
+                <CloseButton Clicked="CloseCreateModalAsync" />
+            </ModalHeader>
+            <ModalBody>
+                <Validations @ref="@CreateValidationsRef" Model="@NewEntity" ValidateOnLoad="false">
+                    <Validation MessageLocalizer="@LH.Localize">
+                        <Field>
+                            <FieldLabel>@L["Title"]</FieldLabel>
+                            <TextEdit @bind-Text="@NewEntity.Title">
+                                <Feedback>
+                                    <ValidationError />
+                                </Feedback>
+                            </TextEdit>
+                        </Field>
+                    </Validation>
+                    <Validation MessageLocalizer="@LH.Localize">
+                        <Field>
+                            <FieldLabel>@L["RouteName"]</FieldLabel>
+                            <TextEdit @bind-Text="@NewEntity.RouteName">
+                                <Feedback>
+                                    <ValidationError />
+                                </Feedback>
+                            </TextEdit>
+                        </Field>
+                    </Validation>
+                    <Field>
+                        <FieldLabel>@L["Content"]</FieldLabel>
+                        <TextEdit @bind-Text="@NewEntity.Content"></TextEdit>
+                    </Field>
+                    <Field>
+                        <FieldLabel>@L["IsHomePage"]</FieldLabel>
+                        <Check TValue="bool" @bind-Checked="@NewEntity.IsHomePage" />
+                    </Field>
+                </Validations>
+            </ModalBody>
+            <ModalFooter>
+                <Button Color="Color.Secondary" Clicked="CloseCreateModalAsync">@L["Cancel"]</Button>
+                <Button Color="Color.Primary" Type="@ButtonType.Submit" PreventDefaultOnSubmit="true"
+                    Clicked="CreateEntityAsync">@L["Save"]</Button>
+            </ModalFooter>
+        </Form>
+    </ModalContent>
+</Modal>
+
+<Modal @ref="@EditModal">
+    <ModalBackdrop />
+    <ModalContent IsCentered="true">
+        <Form>
+            <ModalHeader>
+                <ModalTitle>@EditingEntity.Title</ModalTitle>
+                <CloseButton Clicked="CloseEditModalAsync" />
+            </ModalHeader>
+            <ModalBody>
+                <Validations @ref="@EditValidationsRef" Model="@NewEntity" ValidateOnLoad="false">
+                    <Validation MessageLocalizer="@LH.Localize">
+                        <Field>
+                            <FieldLabel>@L["Title"]</FieldLabel>
+                            <TextEdit @bind-Text="@EditingEntity.Title">
+                                <Feedback>
+                                    <ValidationError />
+                                </Feedback>
+                            </TextEdit>
+                        </Field>
+                    </Validation>
+                    <Validation MessageLocalizer="@LH.Localize">
+                        <Field>
+                            <FieldLabel>@L["RouteName"]</FieldLabel>
+                            <TextEdit @bind-Text="@EditingEntity.RouteName">
+                                <Feedback>
+                                    <ValidationError />
+                                </Feedback>
+                            </TextEdit>
+                        </Field>
+                    </Validation>
+                    <Field>
+                        <FieldLabel>@L["Content"]</FieldLabel>
+                        <TextEdit @bind-Text="@EditingEntity.Content"></TextEdit>
+                    </Field>
+                    <Field>
+                        <FieldLabel>@L["IsHomePage"]</FieldLabel>
+                        <Check TValue="bool" @bind-Checked="@EditingEntity.IsHomePage" />
+                    </Field>
+                </Validations>
+            </ModalBody>
+            <ModalFooter>
+                <Button Color="Color.Secondary" Clicked="CloseEditModalAsync">@L["Cancel"]</Button>
+                <Button Color="Color.Primary" Type="@ButtonType.Submit" PreventDefaultOnSubmit="true"
+                    Clicked="UpdateEntityAsync">@L["Save"]</Button>
+            </ModalFooter>
+        </Form>
+    </ModalContent>
+</Modal>
+@code
+{
+    public Pages() // Constructor
+    {
+        CreatePolicyName = CmsPagesPermissions.Pages.Create;
+        UpdatePolicyName = CmsPagesPermissions.Pages.Edit;
+        DeletePolicyName = CmsPagesPermissions.Pages.Delete;
+
+        LocalizationResource = typeof(CmsPagesResource);
+    }
+}
