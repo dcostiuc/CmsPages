@@ -1,6 +1,10 @@
 ﻿# “CMSPages”, a WIP CMS Full-Stack Web App
 
-Demo:
+Brief Application Demo: 
+https://github.com/user-attachments/assets/c0b247c5-6b2f-4eb9-b2c3-19dd3b4de4ae
+
+Brief Code Demo:
+https://github.com/user-attachments/assets/ffbae90a-f4cf-4daf-84fa-b0b8df1acedf
 
 ## Description
 
