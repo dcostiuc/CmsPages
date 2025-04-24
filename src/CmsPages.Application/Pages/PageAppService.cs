@@ -66,4 +66,15 @@ public class PageAppService : ApplicationService, IPageAppService
     {
         await _repository.DeleteAsync(id);
     }
+
+    public async Task<List<PageMenuItemDto>> GetPageMenuItemsAsync()
+    {
+        var pages = await _repository.GetListAsync();
+        return pages.Select(p => new PageMenuItemDto
+        {
+            Name = $"Page_{p.Id}",
+            DisplayName = p.Title,
+            Url = $"/pages/{p.RouteName}"
+        }).ToList();
+    }
 }

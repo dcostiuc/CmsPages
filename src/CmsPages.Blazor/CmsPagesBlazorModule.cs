@@ -140,7 +140,7 @@ public class CmsPagesBlazorModule : AbpModule
             {
                 options.DisableTransportSecurityRequirement = true;
             });
-            
+
             Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedProto;
@@ -159,7 +159,7 @@ public class CmsPagesBlazorModule : AbpModule
         ConfigureRouter(context);
         ConfigureMenu(context);
     }
-    
+
     private void ConfigureAuthentication(ServiceConfigurationContext context)
     {
         context.Services.ForwardIdentityAuthenticationForBearer(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
@@ -251,8 +251,13 @@ public class CmsPagesBlazorModule : AbpModule
         {
             options.MenuContributors.Add(new CmsPagesMenuContributor());
         });
+
+        Configure<AbpNavigationOptions>(options =>
+{
+    options.MenuContributors.Add(new PageMenuContributor());
+});
     }
-    
+
 
     private void ConfigureRouter(ServiceConfigurationContext context)
     {
