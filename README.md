@@ -3,6 +3,9 @@
 Brief Application Demo: 
 https://github.com/user-attachments/assets/c0b247c5-6b2f-4eb9-b2c3-19dd3b4de4ae
 
+Additional Demo:
+https://github.com/user-attachments/assets/37bee9b3-f024-460e-b836-17e120d47114
+
 Brief Code Demo:
 https://github.com/user-attachments/assets/ffbae90a-f4cf-4daf-84fa-b0b8df1acedf
 
@@ -48,6 +51,7 @@ This includes:
 - Using Blazor UI components
 - Going through the DDD approach for making new features (creating Domain Entities, DTOs, AppService, etc)
 - Permissions for Creating/Editing/Deleting pages
+- Automatically generating menu items for pages
 - Unit tests
 
 Note that this project uses the **Multi-Layer Template**, which is intended for more longer-term/serious/production-level applications.
