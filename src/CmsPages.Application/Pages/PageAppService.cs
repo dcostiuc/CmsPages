@@ -67,6 +67,7 @@ public class PageAppService : ApplicationService, IPageAppService
         await _repository.DeleteAsync(id);
     }
 
+    [AllowAnonymous]
     public async Task<List<PageMenuItemDto>> GetPageMenuItemsAsync()
     {
         var pages = await _repository.GetListAsync();
