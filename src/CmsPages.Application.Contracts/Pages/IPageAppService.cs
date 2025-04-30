@@ -13,4 +13,5 @@ public interface IPageAppService :
         CreateUpdatePageDto> //Used to create/update a page
 {
     Task<List<PageMenuItemDto>> GetPageMenuItemsAsync();
+    Task<PageDto> GetByRouteNameAsync(string routeName);
 }

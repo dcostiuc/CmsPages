@@ -71,11 +71,21 @@ public class PageAppService : ApplicationService, IPageAppService
     public async Task<List<PageMenuItemDto>> GetPageMenuItemsAsync()
     {
         var pages = await _repository.GetListAsync();
-        return pages.Select(p => new PageMenuItemDto
+        return pages.Select(page => new PageMenuItemDto
         {
-            Name = $"Page_{p.Id}",
-            DisplayName = p.Title,
-            Url = $"/pages/{p.RouteName}"
+            Name = $"Page_{page.Id}",
+            DisplayName = page.Title,
+            Url = $"/pages/{page.RouteName}"
         }).ToList();
     }
+
+    [AllowAnonymous]
+    public async Task<PageDto> GetByRouteNameAsync(string routeName)
+    {
+        var page = await _repository.GetAsync(p => p.RouteName == routeName);
+
+        return ObjectMapper.Map<Page, PageDto>(page);
+    }
+
+
 }

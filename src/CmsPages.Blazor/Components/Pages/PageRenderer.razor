@@ -1,0 +1,24 @@
+@page "/pages/{RouteName}"
+@using CmsPages.Pages
+@inject IPageAppService PageAppService
+
+<h1>@Title</h1>
+
+<div class="page-content">
+    @((MarkupString)Content)
+</div>
+@code {
+    [Parameter]
+    public string RouteName { get; set; }
+
+    private string Title;
+    private string Content;
+    
+    [AllowAnonymous]    
+    protected override async Task OnParametersSetAsync()
+    {
+        var page = await PageAppService.GetByRouteNameAsync(RouteName);
+        Title = page.Title;
+        Content = page.Content;
+    }
+}
