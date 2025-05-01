@@ -87,7 +87,7 @@
                     </Validation>
                     <Field>
                         <FieldLabel>@L["Content"]</FieldLabel>
-                        <TextEdit @bind-Text="@NewEntity.Content"></TextEdit>
+                        <RichTextEdit @ref="@createContentEditor" />
                     </Field>
                     <Field>
                         <FieldLabel>@L["IsHomePage"]</FieldLabel>
@@ -136,7 +136,7 @@
                     </Validation>
                     <Field>
                         <FieldLabel>@L["Content"]</FieldLabel>
-                        <TextEdit @bind-Text="@EditingEntity.Content"></TextEdit>
+                        <RichTextEdit @ref="@EditContentEditor" />
                     </Field>
                     <Field>
                         <FieldLabel>@L["IsHomePage"]</FieldLabel>
@@ -154,7 +154,54 @@
 </Modal>
 @code
 {
-    public Pages() // Constructor
+    private RichTextEdit createContentEditor;
+    private RichTextEdit EditContentEditor;
+    private bool isEditModalVisible = false;
+
+    protected override async Task CreateEntityAsync()
+    {
+        NewEntity.Content = await createContentEditor.GetHtmlAsync();
+        await base.CreateEntityAsync();
+    }
+
+    protected override async Task UpdateEntityAsync()
+    {
+        EditingEntity.Content = await EditContentEditor.GetHtmlAsync();
+        await base.UpdateEntityAsync();
+    }
+
+    protected override async Task OpenCreateModalAsync()
+    {
+        await base.OpenCreateModalAsync();
+
+        if (createContentEditor != null)
+        {
+            await createContentEditor.SetHtmlAsync(string.Empty);
+        }
+    }
+
+    protected override async Task OpenEditModalAsync(PageDto entity)
+    {
+        await base.OpenEditModalAsync(entity);
+
+        await InvokeAsync(async () =>
+        {
+            if (EditContentEditor != null)
+            {
+                await EditContentEditor.SetHtmlAsync(EditingEntity?.Content ?? string.Empty);
+            }
+        });
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await createContentEditor.SetHtmlAsync(NewEntity?.Content ?? string.Empty);
+        }
+    }
+
+    public Pages()
     {
         CreatePolicyName = CmsPagesPermissions.Pages.Create;
         UpdatePolicyName = CmsPagesPermissions.Pages.Edit;
