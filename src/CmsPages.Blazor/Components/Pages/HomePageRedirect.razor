@@ -1,0 +1,24 @@
+@page "/"
+@using CmsPages.Pages
+@inject NavigationManager NavigationManager
+@inject IPageAppService PageAppService
+@inherits CmsPagesComponentBase
+
+<p>Loading home page...</p>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var homePage = await PageAppService.GetHomePageAsync();
+
+        if (homePage != null)
+        {
+            NavigationManager.NavigateTo($"/pages/{homePage.RouteName}");
+        }
+        else
+        {
+            // Optionally handle case where no home page is set
+            NavigationManager.NavigateTo("/not-found");
+        }
+    }
+}

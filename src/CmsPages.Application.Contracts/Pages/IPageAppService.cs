@@ -14,4 +14,5 @@ public interface IPageAppService :
 {
     Task<List<PageMenuItemDto>> GetPageMenuItemsAsync();
     Task<PageDto> GetByRouteNameAsync(string routeName);
+    Task<PageDto> GetHomePageAsync();
 }

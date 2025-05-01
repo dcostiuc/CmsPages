@@ -1,6 +1,7 @@
 @page "/pages/{RouteName}"
 @using CmsPages.Pages
 @inject IPageAppService PageAppService
+@inject NavigationManager NavigationManager
 
 <h1>@Title</h1>
 
@@ -17,8 +18,22 @@
     [AllowAnonymous]    
     protected override async Task OnParametersSetAsync()
     {
-        var page = await PageAppService.GetByRouteNameAsync(RouteName);
-        Title = page.Title;
-        Content = page.Content;
+        try
+        {
+            var page = await PageAppService.GetByRouteNameAsync(RouteName);
+            if (page == null)
+            {
+                NavigationManager.NavigateTo("/not-found");
+                return;
+            }
+
+            Title = page.Title;
+            Content = page.Content;
+        }
+        catch (Exception exception)
+        {
+            Console.Error.WriteLine($"An error occurred while loading the page: {exception.Message}");
+            NavigationManager.NavigateTo("/not-found");
+        }
     }
 }

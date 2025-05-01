@@ -82,10 +82,32 @@ public class PageAppService : ApplicationService, IPageAppService
     [AllowAnonymous]
     public async Task<PageDto> GetByRouteNameAsync(string routeName)
     {
-        var page = await _repository.GetAsync(p => p.RouteName == routeName);
+        var page = await _repository.FirstOrDefaultAsync(p => p.RouteName == routeName);
+        if (page == null)
+        {
+            return null;
+        }
 
         return ObjectMapper.Map<Page, PageDto>(page);
     }
+
+    public async Task<PageDto> GetHomePageAsync()
+    {
+        var page = await _repository.FirstOrDefaultAsync(p => p.IsHomePage);
+        if (page == null)
+        {
+            return null;
+        }
+
+        return new PageDto
+        {
+            Id = page.Id,
+            Title = page.Title,
+            Content = page.Content,
+            RouteName = page.RouteName
+        };
+    }
+
 
 
 }
