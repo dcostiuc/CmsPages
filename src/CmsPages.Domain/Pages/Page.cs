@@ -3,7 +3,7 @@ using Volo.Abp.Domain.Entities.Auditing;
 
 namespace CmsPages.Pages;
 
-public class Page : AuditedAggregateRoot<Guid>
+public class Page : FullAuditedAggregateRoot<Guid>
 {
     public required string Title { get; set; }
 

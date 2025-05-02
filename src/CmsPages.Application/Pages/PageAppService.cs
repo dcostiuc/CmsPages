@@ -10,6 +10,7 @@ using Volo.Abp.Domain.Repositories;
 using System.Linq.Dynamic.Core;
 using System.Web;
 using Ganss.Xss;
+using Volo.Abp.Uow;
 
 namespace CmsPages.Pages;
 
@@ -46,9 +47,27 @@ public class PageAppService : ApplicationService, IPageAppService
         );
     }
 
+    [UnitOfWork]
+    private async Task UnsetOtherHomePageAsync(Guid? idToExclude = null)
+    {
+        var currentHomePage = await _pageRepository.FirstOrDefaultAsync(p => p.IsHomePage && p.Id != idToExclude);
+
+        if (currentHomePage != null)
+        {
+            currentHomePage.IsHomePage = false;
+            await _pageRepository.UpdateAsync(currentHomePage, autoSave: true);
+        }
+    }
+
     [Authorize(CmsPagesPermissions.Pages.Create)]
     public async Task<PageDto> CreateAsync(CreateUpdatePageDto input)
     {
+        if (input.IsHomePage)
+        {
+            await UnsetOtherHomePageAsync();
+        }
+
+
         var page = ObjectMapper.Map<CreateUpdatePageDto, Page>(input);
         await _pageRepository.InsertAsync(page);
         return ObjectMapper.Map<Page, PageDto>(page);
@@ -57,6 +76,12 @@ public class PageAppService : ApplicationService, IPageAppService
     [Authorize(CmsPagesPermissions.Pages.Edit)]
     public async Task<PageDto> UpdateAsync(Guid id, CreateUpdatePageDto input)
     {
+
+        if (input.IsHomePage)
+        {
+            await UnsetOtherHomePageAsync(id);
+        }
+
         var page = await _pageRepository.GetAsync(id);
         ObjectMapper.Map(input, page);
         await _pageRepository.UpdateAsync(page);
