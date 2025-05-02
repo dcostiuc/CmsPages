@@ -15,4 +15,6 @@ public interface IPageAppService :
     Task<List<PageMenuItemDto>> GetPageMenuItemsAsync();
     Task<PageDto> GetByRouteNameAsync(string routeName);
     Task<PageDto> GetHomePageAsync();
+    public string DecodeHtmlContent(string encodedContent);
+    public string GetDecodedAndSanitizedPageContentAsync(string encodedContent);
 }

@@ -8,6 +8,8 @@ using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 using System.Linq.Dynamic.Core;
+using System.Web;
+using Ganss.Xss;
 
 namespace CmsPages.Pages;
 
@@ -108,6 +110,20 @@ public class PageAppService : ApplicationService, IPageAppService
         };
     }
 
+    public string DecodeHtmlContent(string encodedContent)
+    {
+        return HttpUtility.HtmlDecode(encodedContent);
+    }
 
+    public string SanitizeHtml(string htmlContent)
+    {
+        var sanitizer = new HtmlSanitizer();
+        return sanitizer.Sanitize(htmlContent);
+    }
 
+    public string GetDecodedAndSanitizedPageContentAsync(string encodedContent)
+    {
+        string decodedContent = DecodeHtmlContent(encodedContent);
+        return SanitizeHtml(decodedContent);
+    }
 }

@@ -11,11 +11,10 @@
 @code {
     [Parameter]
     public string RouteName { get; set; }
-
     private string Title;
     private string Content;
-    
-    [AllowAnonymous]    
+
+    [AllowAnonymous]
     protected override async Task OnParametersSetAsync()
     {
         try

@@ -9,6 +9,7 @@
 @using Volo.Abp.AspNetCore.Components.Web
 @inject IStringLocalizer<CmsPagesResource> L
 @inject AbpBlazorMessageLocalizerHelper<CmsPagesResource> LH
+@inject PageAppService PageAppService
 @inherits AbpCrudPageBase<IPageAppService, PageDto, Guid, PagedAndSortedResultRequestDto, CreateUpdatePageDto>
 
 <Card>
@@ -160,13 +161,19 @@
 
     protected override async Task CreateEntityAsync()
     {
-        NewEntity.Content = await createContentEditor.GetHtmlAsync();
+        var rawContent = await createContentEditor.GetHtmlAsync();
+
+        NewEntity.Content = PageAppService.GetDecodedAndSanitizedPageContentAsync(rawContent);
+
         await base.CreateEntityAsync();
     }
 
     protected override async Task UpdateEntityAsync()
     {
-        EditingEntity.Content = await EditContentEditor.GetHtmlAsync();
+        var rawContent = await EditContentEditor.GetHtmlAsync();
+
+        EditingEntity.Content = PageAppService.GetDecodedAndSanitizedPageContentAsync(rawContent);
+
         await base.UpdateEntityAsync();
     }
 
