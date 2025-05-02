@@ -16,22 +16,22 @@ namespace CmsPages.Pages;
 [Authorize(CmsPagesPermissions.Pages.Default)]
 public class PageAppService : ApplicationService, IPageAppService
 {
-    private readonly IRepository<Page, Guid> _repository;
+    private readonly IRepository<Page, Guid> _pageRepository;
 
     public PageAppService(IRepository<Page, Guid> repository)
     {
-        _repository = repository;
+        _pageRepository = repository;
     }
 
     public async Task<PageDto> GetAsync(Guid id)
     {
-        var page = await _repository.GetAsync(id);
+        var page = await _pageRepository.GetAsync(id);
         return ObjectMapper.Map<Page, PageDto>(page);
     }
 
     public async Task<PagedResultDto<PageDto>> GetListAsync(PagedAndSortedResultRequestDto input)
     {
-        var queryable = await _repository.GetQueryableAsync();
+        var queryable = await _pageRepository.GetQueryableAsync();
         var query = queryable
             .OrderBy(input.Sorting.IsNullOrWhiteSpace() ? "Title" : input.Sorting)
             .Skip(input.SkipCount)
@@ -50,29 +50,29 @@ public class PageAppService : ApplicationService, IPageAppService
     public async Task<PageDto> CreateAsync(CreateUpdatePageDto input)
     {
         var page = ObjectMapper.Map<CreateUpdatePageDto, Page>(input);
-        await _repository.InsertAsync(page);
+        await _pageRepository.InsertAsync(page);
         return ObjectMapper.Map<Page, PageDto>(page);
     }
 
     [Authorize(CmsPagesPermissions.Pages.Edit)]
     public async Task<PageDto> UpdateAsync(Guid id, CreateUpdatePageDto input)
     {
-        var page = await _repository.GetAsync(id);
+        var page = await _pageRepository.GetAsync(id);
         ObjectMapper.Map(input, page);
-        await _repository.UpdateAsync(page);
+        await _pageRepository.UpdateAsync(page);
         return ObjectMapper.Map<Page, PageDto>(page);
     }
 
     [Authorize(CmsPagesPermissions.Pages.Delete)]
     public async Task DeleteAsync(Guid id)
     {
-        await _repository.DeleteAsync(id);
+        await _pageRepository.DeleteAsync(id);
     }
 
     [AllowAnonymous]
     public async Task<List<PageMenuItemDto>> GetPageMenuItemsAsync()
     {
-        var pages = await _repository.GetListAsync();
+        var pages = await _pageRepository.GetListAsync();
         return pages.Select(page => new PageMenuItemDto
         {
             Name = $"Page_{page.Id}",
@@ -84,7 +84,7 @@ public class PageAppService : ApplicationService, IPageAppService
     [AllowAnonymous]
     public async Task<PageDto> GetByRouteNameAsync(string routeName)
     {
-        var page = await _repository.FirstOrDefaultAsync(p => p.RouteName == routeName);
+        var page = await _pageRepository.FirstOrDefaultAsync(p => p.RouteName == routeName);
         if (page == null)
         {
             return null;
@@ -95,7 +95,7 @@ public class PageAppService : ApplicationService, IPageAppService
 
     public async Task<PageDto> GetHomePageAsync()
     {
-        var page = await _repository.FirstOrDefaultAsync(p => p.IsHomePage);
+        var page = await _pageRepository.FirstOrDefaultAsync(p => p.IsHomePage);
         if (page == null)
         {
             return null;
