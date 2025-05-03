@@ -54,7 +54,7 @@ public class CmsPagesMenuContributor : IMenuContributor
          new ApplicationMenuItem(
              "Pages",
              l["Menu:Pages"],
-             icon: "fa fa-page",
+             icon: "fas fa-file-alt",
              url: "/pages"
          ).RequirePermissions(CmsPagesPermissions.Pages.Default)
         );

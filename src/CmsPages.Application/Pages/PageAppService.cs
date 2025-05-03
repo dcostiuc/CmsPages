@@ -11,6 +11,7 @@ using System.Linq.Dynamic.Core;
 using System.Web;
 using Ganss.Xss;
 using Volo.Abp.Uow;
+using CmsPages.Helpers;
 
 namespace CmsPages.Pages;
 
@@ -18,10 +19,12 @@ namespace CmsPages.Pages;
 public class PageAppService : ApplicationService, IPageAppService
 {
     private readonly IRepository<Page, Guid> _pageRepository;
+    private readonly ISlugHelper _slugHelper;
 
-    public PageAppService(IRepository<Page, Guid> repository)
+    public PageAppService(IRepository<Page, Guid> repository, ISlugHelper slugHelper)
     {
         _pageRepository = repository;
+        _slugHelper = slugHelper;
     }
 
     public async Task<PageDto> GetAsync(Guid id)
@@ -67,6 +70,7 @@ public class PageAppService : ApplicationService, IPageAppService
             await UnsetOtherHomePageAsync();
         }
 
+        input.RouteName = _slugHelper.Slugify(input.RouteName);
 
         var page = ObjectMapper.Map<CreateUpdatePageDto, Page>(input);
         await _pageRepository.InsertAsync(page);
@@ -81,6 +85,8 @@ public class PageAppService : ApplicationService, IPageAppService
         {
             await UnsetOtherHomePageAsync(id);
         }
+
+        input.RouteName = _slugHelper.Slugify(input.RouteName);
 
         var page = await _pageRepository.GetAsync(id);
         ObjectMapper.Map(input, page);
