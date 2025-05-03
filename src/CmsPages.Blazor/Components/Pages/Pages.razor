@@ -91,9 +91,14 @@
                         <RichTextEdit @ref="@createContentEditor" />
                     </Field>
                     <Field>
-                        <FieldLabel>@L["IsHomePage"]</FieldLabel>
-                        <Check TValue="bool" @bind-Checked="@NewEntity.IsHomePage" />
+                        <div class="d-flex align-items-center gap-2">
+                            <label for="isHomePageCheckboxCreate"
+                                class="form-check-label mb-0">@L["SetToHomePage"]</label>
+                            <Check TValue="bool" Id="isHomePageCheckboxCreate" @bind-Checked="@NewEntity.IsHomePage" />
+                        </div>
                     </Field>
+
+
                 </Validations>
             </ModalBody>
             <ModalFooter>
@@ -140,9 +145,15 @@
                         <RichTextEdit @ref="@EditContentEditor" />
                     </Field>
                     <Field>
-                        <FieldLabel>@L["IsHomePage"]</FieldLabel>
-                        <Check TValue="bool" @bind-Checked="@EditingEntity.IsHomePage" />
+                        <div class="d-flex align-items-center gap-2">
+                            <label for="isHomePageCheckboxEdit"
+                                class="form-check-label mb-0">@L["SetToHomePage"]</label>
+                            <Check TValue="bool" Id="isHomePageCheckboxEdit"
+                                @bind-Checked="@EditingEntity.IsHomePage" />
+                        </div>
                     </Field>
+
+
                 </Validations>
             </ModalBody>
             <ModalFooter>
