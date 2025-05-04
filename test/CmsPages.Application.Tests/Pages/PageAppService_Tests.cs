@@ -13,7 +13,7 @@ namespace CmsPages.Pages;
 public abstract class PageAppService_Tests<TStartupModule> : CmsPagesApplicationTestBase<TStartupModule>
     where TStartupModule : IAbpModule
 {
-    private readonly IPageAppService _pageAppService;
+    protected readonly IPageAppService _pageAppService;
 
     protected PageAppService_Tests()
     {
