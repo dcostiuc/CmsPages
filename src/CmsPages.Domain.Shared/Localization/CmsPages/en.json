@@ -24,6 +24,7 @@
     "LongWelcomeMessage": "Welcome to the application. This is a startup project based on the ABP framework. For more information visit",
     "Welcome": "Welcome",
     "RouteName": "Route",
-    "SetToHomePage" : "Set as home page?"
+    "SetToHomePage" : "Set as home page?",
+    "IsHomePage": "Is this the home page?"
   }
 }
