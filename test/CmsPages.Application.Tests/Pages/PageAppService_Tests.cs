@@ -201,7 +201,6 @@ public abstract class PageAppService_Tests<TStartupModule> : CmsPagesApplication
         exception.ShouldBeNull();
     }
 
-
     [Fact]
     public async Task Should_Return_Empty_List_When_No_Pages_Exist()
     {
@@ -219,5 +218,100 @@ public abstract class PageAppService_Tests<TStartupModule> : CmsPagesApplication
         result.TotalCount.ShouldBe(0);
         result.Items.ShouldBeEmpty();
     }
+
+    [Fact]
+    public async Task Should_Get_Page_Menu_Items()
+    {
+        // Act
+        var result = await _pageAppService.GetPageMenuItemsAsync();
+
+        // Assert
+        result.ShouldNotBeNull();
+        result.Count.ShouldBeGreaterThan(0);
+        result.ShouldContain(item => !string.IsNullOrWhiteSpace(item.DisplayName));
+    }
+
+    [Fact]
+    public async Task Should_Get_Page_By_Route_Name()
+    {
+        // Arrange
+        var created = await _pageAppService.CreateAsync(new CreateUpdatePageDto
+        {
+            Title = "A Random Page",
+            RouteName = "a-random-page",
+            Content = null,
+            IsHomePage = false
+        });
+
+        // Act
+        var result = await _pageAppService.GetByRouteNameAsync("a-random-page");
+
+        // Assert
+        result.ShouldNotBeNull();
+        result?.Id.ShouldBe(created.Id);
+        result?.Title.ShouldBe("A Random Page");
+        result?.Content.ShouldBe(null);
+    }
+
+    [Fact]
+    public async Task Should_Return_Null_If_Route_Name_Not_Found()
+    {
+        // Act
+        var result = await _pageAppService.GetByRouteNameAsync("non-existent-route");
+
+        // Assert
+        result.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task Should_Get_Home_Page()
+    {
+        // Arrange
+        var homePage = await _pageAppService.CreateAsync(new CreateUpdatePageDto
+        {
+            Title = "Home Page",
+            RouteName = "home",
+            Content = "<b>Home</b>",
+            IsHomePage = true
+        });
+
+        // Act
+        var result = await _pageAppService.GetHomePageAsync();
+
+        // Assert
+        result.ShouldNotBeNull();
+        result?.IsHomePage.ShouldBeTrue();
+        result?.Id.ShouldBe(homePage.Id);
+        result?.Content.ShouldBe("<b>Home</b>");
+    }
+
+    [Fact]
+    public void Should_Decode_Html_Content()
+    {
+        // Arrange
+        var encoded = "This &amp; that &lt;div&gt;";
+
+        // Act
+        var result = _pageAppService.DecodeHtmlContent(encoded);
+
+        // Assert
+        result.ShouldBe("This & that <div>");
+    }
+
+    [Fact]
+    public void Should_Decode_And_Sanitize_Html_Content()
+    {
+        // Arrange
+        var encodedHtml = "&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;&lt;div&gt;Hello&lt;/div&gt;";
+
+        // Act
+        var result = _pageAppService.GetDecodedAndSanitizedPageContentAsync(encodedHtml);
+
+        // Assert
+        result.ShouldContain("Hello");
+        result.ShouldNotContain("script");
+        result.ShouldNotContain("alert");
+    }
+
 
 }

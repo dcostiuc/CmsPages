@@ -132,13 +132,7 @@ public class PageAppService : ApplicationService, IPageAppService
             return null;
         }
 
-        return new PageDto
-        {
-            Id = page.Id,
-            Title = page.Title,
-            Content = page.Content,
-            RouteName = page.RouteName
-        };
+        return ObjectMapper.Map<Page, PageDto>(page);
     }
 
     public string DecodeHtmlContent(string encodedContent)
