@@ -313,5 +313,60 @@ public abstract class PageAppService_Tests<TStartupModule> : CmsPagesApplication
         result.ShouldNotContain("alert");
     }
 
+    [Fact]
+    public async Task Should_Allow_Null_Content()
+    {
+        // Act
+        var result = await _pageAppService.CreateAsync(new CreateUpdatePageDto
+        {
+            Title = "Valid Title",
+            RouteName = "valid-route-name",
+            Content = null,  // Content is optional
+            IsHomePage = false
+        });
+
+        // Assert
+        result.ShouldNotBeNull();
+        result.Content.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task Should_Throw_When_Title_Exceeds_Max_Length()
+    {
+        // Act and Assert
+        var exception = await Assert.ThrowsAsync<AbpValidationException>(async () =>
+        {
+            await _pageAppService.CreateAsync(new CreateUpdatePageDto
+            {
+                Title = new string('a', 129),  // Title exceeds 128 characters
+                RouteName = "another-route-name",
+                Content = "Test Content",
+                IsHomePage = false
+            });
+        });
+
+        exception.ValidationErrors
+            .ShouldContain(err => err.MemberNames.Any(mem => mem == "Title"));
+    }
+
+    [Fact]
+    public async Task Should_Throw_When_RouteName_Exceeds_Max_Length()
+    {
+        // Act and Assert
+        var exception = await Assert.ThrowsAsync<AbpValidationException>(async () =>
+        {
+            await _pageAppService.CreateAsync(new CreateUpdatePageDto
+            {
+                Title = "Another Title",
+                RouteName = new string('a', 129),  // RouteName exceeds 128 characters
+                Content = "Test Content",
+                IsHomePage = false
+            });
+        });
+
+        exception.ValidationErrors
+            .ShouldContain(err => err.MemberNames.Any(mem => mem == "RouteName"));
+    }
+
 
 }
