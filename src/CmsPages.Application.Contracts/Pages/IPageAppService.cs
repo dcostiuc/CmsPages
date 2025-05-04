@@ -13,8 +13,8 @@ public interface IPageAppService :
         CreateUpdatePageDto> //Used to create/update a page
 {
     Task<List<PageMenuItemDto>> GetPageMenuItemsAsync();
-    Task<PageDto> GetByRouteNameAsync(string routeName);
-    Task<PageDto> GetHomePageAsync();
+    Task<PageDto?> GetByRouteNameAsync(string routeName);
+    Task<PageDto?> GetHomePageAsync();
     public string DecodeHtmlContent(string encodedContent);
     public string GetDecodedAndSanitizedPageContentAsync(string encodedContent);
 }
