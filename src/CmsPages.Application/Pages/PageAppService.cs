@@ -13,6 +13,7 @@ using Ganss.Xss;
 using Volo.Abp.Uow;
 using CmsPages.Helpers;
 using Volo.Abp;
+using Microsoft.Extensions.Logging;
 
 namespace CmsPages.Pages;
 
@@ -30,8 +31,21 @@ public class PageAppService : ApplicationService, IPageAppService
 
     public async Task<PageDto> GetAsync(Guid id)
     {
-        var page = await _pageRepository.GetAsync(id);
-        return ObjectMapper.Map<Page, PageDto>(page);
+        try
+        {
+            var page = await _pageRepository.GetAsync(id);
+            return ObjectMapper.Map<Page, PageDto>(page);
+        }
+        catch (UserFriendlyException)
+        {
+            // Already user-facing and taken care of by ABP framework, so we just rethrow
+            throw;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, $"Error getting page id {id}");
+            throw new UserFriendlyException("An unexpected error occurred while retrieving the page.");
+        }
     }
 
     public async Task<PagedResultDto<PageDto>> GetListAsync(PagedAndSortedResultRequestDto input)
@@ -66,45 +80,71 @@ public class PageAppService : ApplicationService, IPageAppService
     [Authorize(CmsPagesPermissions.Pages.Create)]
     public async Task<PageDto> CreateAsync(CreateUpdatePageDto input)
     {
-        input.RouteName = _slugHelper.Slugify(input.RouteName);
-
-        var pageWithSameRouteNameExists = await _pageRepository.AnyAsync(p => p.RouteName == input.RouteName);
-        if (pageWithSameRouteNameExists)
+        try
         {
-            throw new UserFriendlyException($"A page with the route name '{input.RouteName}' already exists.");
-        }
+            input.RouteName = _slugHelper.Slugify(input.RouteName);
 
-        if (input.IsHomePage)
+            var pageWithSameRouteNameExists = await _pageRepository.AnyAsync(p => p.RouteName == input.RouteName);
+            if (pageWithSameRouteNameExists)
+            {
+                throw new UserFriendlyException($"A page with the route name '{input.RouteName}' already exists.");
+            }
+
+            if (input.IsHomePage)
+            {
+                await UnsetOtherHomePageAsync();
+            }
+
+            var page = ObjectMapper.Map<CreateUpdatePageDto, Page>(input);
+            await _pageRepository.InsertAsync(page);
+            return ObjectMapper.Map<Page, PageDto>(page);
+        }
+        catch (UserFriendlyException)
         {
-            await UnsetOtherHomePageAsync();
+            // Already user-facing and taken care of by ABP framework, so we just rethrow
+            throw;
         }
-
-        var page = ObjectMapper.Map<CreateUpdatePageDto, Page>(input);
-        await _pageRepository.InsertAsync(page);
-        return ObjectMapper.Map<Page, PageDto>(page);
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error creating page");
+            throw new UserFriendlyException("An unexpected error occurred while creating the page.");
+        }
     }
 
     [Authorize(CmsPagesPermissions.Pages.Edit)]
     public async Task<PageDto> UpdateAsync(Guid id, CreateUpdatePageDto input)
     {
-        input.RouteName = _slugHelper.Slugify(input.RouteName);
-
-        var pageWithSameRouteNameExists = await _pageRepository.AnyAsync(p => p.RouteName == input.RouteName && p.Id != id);
-        if (pageWithSameRouteNameExists)
+        try
         {
-            throw new UserFriendlyException($"Another page already uses the route name '{input.RouteName}'.");
-        }
+            input.RouteName = _slugHelper.Slugify(input.RouteName);
 
-        if (input.IsHomePage)
+            var pageWithSameRouteNameExists = await _pageRepository.AnyAsync(p => p.RouteName == input.RouteName && p.Id != id);
+            if (pageWithSameRouteNameExists)
+            {
+                throw new UserFriendlyException($"Another page already uses the route name '{input.RouteName}'.");
+            }
+
+            if (input.IsHomePage)
+            {
+                await UnsetOtherHomePageAsync(id);
+            }
+
+
+            var page = await _pageRepository.GetAsync(id);
+            ObjectMapper.Map(input, page);
+            await _pageRepository.UpdateAsync(page);
+            return ObjectMapper.Map<Page, PageDto>(page);
+        }
+        catch (UserFriendlyException)
         {
-            await UnsetOtherHomePageAsync(id);
+            // Already user-facing and taken care of by ABP framework, so we just rethrow
+            throw;
         }
-
-
-        var page = await _pageRepository.GetAsync(id);
-        ObjectMapper.Map(input, page);
-        await _pageRepository.UpdateAsync(page);
-        return ObjectMapper.Map<Page, PageDto>(page);
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, $"Error updating page id {id}, '{input.Title}'");
+            throw new UserFriendlyException("An unexpected error occurred while updating the page.");
+        }
     }
 
     [Authorize(CmsPagesPermissions.Pages.Delete)]
