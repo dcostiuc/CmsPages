@@ -7,6 +7,7 @@ using Volo.Abp.Domain.Entities;
 using Volo.Abp.Modularity;
 using Volo.Abp.Validation;
 using Xunit;
+using Volo.Abp;
 
 namespace CmsPages.Pages;
 
@@ -368,5 +369,59 @@ public abstract class PageAppService_Tests<TStartupModule> : CmsPagesApplication
             .ShouldContain(err => err.MemberNames.Any(mem => mem == "RouteName"));
     }
 
+    [Fact]
+    public async Task Should_Throw_When_Creating_Page_With_Existing_RouteName()
+    {
+        // Arrange
+        await _pageAppService.CreateAsync(new CreateUpdatePageDto
+        {
+            Title = "First Page",
+            RouteName = "duplicate-route",
+            Content = "<p>Page 1</p>"
+        });
+
+        // Act and Assert
+        var exception = await Assert.ThrowsAsync<UserFriendlyException>(async () =>
+        {
+            await _pageAppService.CreateAsync(new CreateUpdatePageDto
+            {
+                Title = "Second Page",
+                RouteName = "duplicate-route",
+                Content = "<p>Page 2</p>"
+            });
+        });
+        exception.Message.ShouldContain("already uses the route name");
+    }
+
+    [Fact]
+    public async Task Should_Throw_When_Updating_Page_To_Existing_RouteName()
+    {
+        // Arrange
+        var page1 = await _pageAppService.CreateAsync(new CreateUpdatePageDto
+        {
+            Title = "Page One",
+            RouteName = "first-route",
+            Content = "Content 1"
+        });
+
+        var page2 = await _pageAppService.CreateAsync(new CreateUpdatePageDto
+        {
+            Title = "Page Two",
+            RouteName = "another-route",
+            Content = "Content 2"
+        });
+
+        // Act and Assert
+        var exception = await Assert.ThrowsAsync<UserFriendlyException>(async () =>
+        {
+            await _pageAppService.UpdateAsync(page2.Id, new CreateUpdatePageDto
+            {
+                Title = "Page Two Edited",
+                RouteName = "first-route", // Same as page1
+                Content = "Updated Content"
+            });
+        });
+        exception.Message.ShouldContain("already uses the route name");
+    }
 
 }

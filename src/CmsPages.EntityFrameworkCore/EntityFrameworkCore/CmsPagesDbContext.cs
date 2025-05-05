@@ -87,7 +87,10 @@ public class CmsPagesDbContext :
                 CmsPagesConsts.DbSchema);
             b.ConfigureByConvention(); //auto configure for the base class props
             b.Property(x => x.Title).IsRequired().HasMaxLength(128);
+            b.Property(x => x.RouteName).IsRequired().HasMaxLength(128);
+            b.HasIndex(p => p.RouteName).IsUnique();
         });
+
 
         /* Configure your own tables/entities inside here */
 

@@ -12,6 +12,7 @@ using System.Web;
 using Ganss.Xss;
 using Volo.Abp.Uow;
 using CmsPages.Helpers;
+using Volo.Abp;
 
 namespace CmsPages.Pages;
 
@@ -65,12 +66,18 @@ public class PageAppService : ApplicationService, IPageAppService
     [Authorize(CmsPagesPermissions.Pages.Create)]
     public async Task<PageDto> CreateAsync(CreateUpdatePageDto input)
     {
+        input.RouteName = _slugHelper.Slugify(input.RouteName);
+
+        var pageWithSameRouteNameExists = await _pageRepository.AnyAsync(p => p.RouteName == input.RouteName);
+        if (pageWithSameRouteNameExists)
+        {
+            throw new UserFriendlyException($"A page with the route name '{input.RouteName}' already exists.");
+        }
+
         if (input.IsHomePage)
         {
             await UnsetOtherHomePageAsync();
         }
-
-        input.RouteName = _slugHelper.Slugify(input.RouteName);
 
         var page = ObjectMapper.Map<CreateUpdatePageDto, Page>(input);
         await _pageRepository.InsertAsync(page);
@@ -80,13 +87,19 @@ public class PageAppService : ApplicationService, IPageAppService
     [Authorize(CmsPagesPermissions.Pages.Edit)]
     public async Task<PageDto> UpdateAsync(Guid id, CreateUpdatePageDto input)
     {
+        input.RouteName = _slugHelper.Slugify(input.RouteName);
+
+        var pageWithSameRouteNameExists = await _pageRepository.AnyAsync(p => p.RouteName == input.RouteName && p.Id != id);
+        if (pageWithSameRouteNameExists)
+        {
+            throw new UserFriendlyException($"Another page already uses the route name '{input.RouteName}'.");
+        }
 
         if (input.IsHomePage)
         {
             await UnsetOtherHomePageAsync(id);
         }
 
-        input.RouteName = _slugHelper.Slugify(input.RouteName);
 
         var page = await _pageRepository.GetAsync(id);
         ObjectMapper.Map(input, page);
