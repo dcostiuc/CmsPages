@@ -390,7 +390,7 @@ public abstract class PageAppService_Tests<TStartupModule> : CmsPagesApplication
                 Content = "<p>Page 2</p>"
             });
         });
-        exception.Message.ShouldContain("already uses the route name");
+        exception.Message.ShouldContain("A page with the route name");
     }
 
     [Fact]
