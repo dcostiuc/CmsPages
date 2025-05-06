@@ -4,7 +4,7 @@ using Volo.Abp.Application.Dtos;
 
 namespace CmsPages.Pages;
 
-public class PageDto : AuditedEntityDto<Guid>
+public class PageDto : FullAuditedEntityDto<Guid>
 {
     [StringLength(PageConsts.MaxTitleLength)]
     public string Title { get; set; }
