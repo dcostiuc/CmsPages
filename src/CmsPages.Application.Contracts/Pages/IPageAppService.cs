@@ -9,7 +9,7 @@ public interface IPageAppService :
     ICrudAppService< //Defines CRUD methods
         PageDto, //Used to show pages
         Guid, //Primary key of the Page entity
-        PagedAndSortedResultRequestDto, //Used for paging/sorting
+        PageFilterDto, //Used for paging/sorting/filtering
         CreateUpdatePageDto> //Used to create/update a page
 {
     Task<List<PageMenuItemDto>> GetPageMenuItemsAsync();

@@ -26,7 +26,7 @@ public abstract class PageAppService_Tests<TStartupModule> : CmsPagesApplication
     {
         //Act
         var result = await _pageAppService.GetListAsync(
-            new PagedAndSortedResultRequestDto()
+            new PageFilterDto()
         );
 
         //Assert
@@ -134,7 +134,7 @@ public abstract class PageAppService_Tests<TStartupModule> : CmsPagesApplication
     public async Task Should_Update_Existing_Page()
     {
         // Arrange
-        var pages = await _pageAppService.GetListAsync(new PagedAndSortedResultRequestDto());
+        var pages = await _pageAppService.GetListAsync(new PageFilterDto());
         var pageToUpdate = pages.Items.First();
 
         var updatedDto = new CreateUpdatePageDto
@@ -191,7 +191,7 @@ public abstract class PageAppService_Tests<TStartupModule> : CmsPagesApplication
         await _pageAppService.DeleteAsync(newPageToBeDeleted.Id);
 
         // Assert
-        var list = await _pageAppService.GetListAsync(new PagedAndSortedResultRequestDto());
+        var list = await _pageAppService.GetListAsync(new PageFilterDto());
         list.Items.ShouldNotContain(p => p.Id == newPageToBeDeleted.Id);
     }
 
@@ -210,14 +210,14 @@ public abstract class PageAppService_Tests<TStartupModule> : CmsPagesApplication
     public async Task Should_Return_Empty_List_When_No_Pages_Exist()
     {
         // Arrange: make sure the db has no pages by deleting them all, at least for this test
-        var allPages = await _pageAppService.GetListAsync(new PagedAndSortedResultRequestDto());
+        var allPages = await _pageAppService.GetListAsync(new PageFilterDto());
         foreach (var page in allPages.Items)
         {
             await _pageAppService.DeleteAsync(page.Id);
         }
 
         // Act
-        var result = await _pageAppService.GetListAsync(new PagedAndSortedResultRequestDto());
+        var result = await _pageAppService.GetListAsync(new PageFilterDto());
 
         // Assert
         result.TotalCount.ShouldBe(0);

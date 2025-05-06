@@ -49,16 +49,25 @@ public class PageAppService : ApplicationService, IPageAppService
         }
     }
 
-    public async Task<PagedResultDto<PageDto>> GetListAsync(PagedAndSortedResultRequestDto input)
+    public async Task<PagedResultDto<PageDto>> GetListAsync(PageFilterDto input)
     {
         var queryable = await _pageRepository.GetQueryableAsync();
+
+        // Filtering
+        queryable = queryable
+            .WhereIf(!input.Title.IsNullOrWhiteSpace(), p => p.Title.Contains(input.Title!))
+            .WhereIf(!input.RouteName.IsNullOrWhiteSpace(), p => p.RouteName.Contains(input.RouteName!));
+
+        // Get total count after filtering
+        var totalCount = await AsyncExecuter.CountAsync(queryable);
+
+        // Apply sorting and pagination
         var query = queryable
             .OrderBy(input.Sorting.IsNullOrWhiteSpace() ? "Title" : input.Sorting)
             .Skip(input.SkipCount)
             .Take(input.MaxResultCount);
 
         var pages = await AsyncExecuter.ToListAsync(query);
-        var totalCount = await AsyncExecuter.CountAsync(queryable);
 
         return new PagedResultDto<PageDto>(
             totalCount,
