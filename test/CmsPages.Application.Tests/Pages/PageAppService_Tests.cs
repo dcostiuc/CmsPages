@@ -122,10 +122,12 @@ public abstract class PageAppService_Tests<TStartupModule> : CmsPagesApplication
         var nonExistentId = Guid.NewGuid();
 
         // Act and Assert
-        await Assert.ThrowsAsync<EntityNotFoundException>(async () =>
+        var exception = await Assert.ThrowsAsync<UserFriendlyException>(async () =>
         {
             await _pageAppService.GetAsync(nonExistentId);
         });
+
+        Assert.Equal(CmsPagesDomainErrorCodes.PageNotFound, exception.Code);
     }
 
     [Fact]
@@ -165,10 +167,12 @@ public abstract class PageAppService_Tests<TStartupModule> : CmsPagesApplication
             IsHomePage = false
         };
 
-        await Assert.ThrowsAsync<EntityNotFoundException>(async () =>
+        var exception = await Assert.ThrowsAsync<UserFriendlyException>(async () =>
         {
             await _pageAppService.UpdateAsync(nonExistentId, updatedDto);
         });
+
+        Assert.Equal(CmsPagesDomainErrorCodes.PageUpdateFailed, exception.Code);
     }
 
     [Fact]
@@ -391,6 +395,7 @@ public abstract class PageAppService_Tests<TStartupModule> : CmsPagesApplication
             });
         });
         exception.Message.ShouldContain("A page with the route name");
+        Assert.Equal(CmsPagesDomainErrorCodes.PageCreationFailedExistingRoute, exception.Code);
     }
 
     [Fact]
@@ -422,6 +427,7 @@ public abstract class PageAppService_Tests<TStartupModule> : CmsPagesApplication
             });
         });
         exception.Message.ShouldContain("already uses the route name");
+        Assert.Equal(CmsPagesDomainErrorCodes.PageUpdateFailedExistingRoute, exception.Code);
     }
 
 }

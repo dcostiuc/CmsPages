@@ -45,7 +45,7 @@ public class PageAppService : ApplicationService, IPageAppService
         catch (Exception ex)
         {
             Logger.LogError(ex, $"Error getting page id {id}");
-            throw new UserFriendlyException("An unexpected error occurred while retrieving the page.");
+            throw new UserFriendlyException("An unexpected error occurred while retrieving the page.", CmsPagesDomainErrorCodes.PageNotFound);
         }
     }
 
@@ -88,7 +88,7 @@ public class PageAppService : ApplicationService, IPageAppService
             var pageWithSameRouteNameExists = await _pageRepository.AnyAsync(p => p.RouteName == input.RouteName);
             if (pageWithSameRouteNameExists)
             {
-                throw new UserFriendlyException($"A page with the route name '{input.RouteName}' already exists.");
+                throw new UserFriendlyException($"A page with the route name '{input.RouteName}' already exists.", CmsPagesDomainErrorCodes.PageCreationFailedExistingRoute);
             }
 
             if (input.IsHomePage)
@@ -108,7 +108,7 @@ public class PageAppService : ApplicationService, IPageAppService
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error creating page");
-            throw new UserFriendlyException("An unexpected error occurred while creating the page.");
+            throw new UserFriendlyException("An unexpected error occurred while creating the page.", CmsPagesDomainErrorCodes.PageCreationFailed);
         }
     }
 
@@ -122,7 +122,7 @@ public class PageAppService : ApplicationService, IPageAppService
             var pageWithSameRouteNameExists = await _pageRepository.AnyAsync(p => p.RouteName == input.RouteName && p.Id != id);
             if (pageWithSameRouteNameExists)
             {
-                throw new UserFriendlyException($"Another page already uses the route name '{input.RouteName}'.");
+                throw new UserFriendlyException($"Another page already uses the route name '{input.RouteName}'.", CmsPagesDomainErrorCodes.PageUpdateFailedExistingRoute);
             }
 
             if (input.IsHomePage)
@@ -144,7 +144,7 @@ public class PageAppService : ApplicationService, IPageAppService
         catch (Exception ex)
         {
             Logger.LogError(ex, $"Error updating page id {id}, '{input.Title}'");
-            throw new UserFriendlyException("An unexpected error occurred while updating the page.");
+            throw new UserFriendlyException("An unexpected error occurred while updating the page.", CmsPagesDomainErrorCodes.PageUpdateFailed);
         }
     }
 
