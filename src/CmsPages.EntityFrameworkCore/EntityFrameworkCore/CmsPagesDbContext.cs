@@ -86,8 +86,9 @@ public class CmsPagesDbContext :
             b.ToTable(CmsPagesConsts.DbTablePrefix + "Pages",
                 CmsPagesConsts.DbSchema);
             b.ConfigureByConvention(); //auto configure for the base class props
-            b.Property(x => x.Title).IsRequired().HasMaxLength(128);
-            b.Property(x => x.RouteName).IsRequired().HasMaxLength(128);
+            b.Property(x => x.Title).IsRequired().HasMaxLength(PageConsts.MaxTitleLength);
+            b.Property(x => x.RouteName).IsRequired().HasMaxLength(PageConsts.MaxRouteNameLength);
+            b.Property(x => x.Content).HasMaxLength(PageConsts.MaxContentLength);
             b.HasIndex(p => p.RouteName).IsUnique();
         });
 

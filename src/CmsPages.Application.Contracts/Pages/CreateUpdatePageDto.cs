@@ -5,14 +5,15 @@ namespace CmsPages.Pages;
 public class CreateUpdatePageDto
 {
     [Required]
-    [StringLength(128)]
+    [StringLength(PageConsts.MaxTitleLength)]
     public string Title { get; set; }
 
 
     [Required]
-    [StringLength(128)]
+    [StringLength(PageConsts.MaxRouteNameLength)]
     public string RouteName { get; set; }
 
+    [StringLength(PageConsts.MaxContentLength, ErrorMessage = "Content is too long.")]
     public string? Content { get; set; }
 
     public bool IsHomePage { get; set; }
