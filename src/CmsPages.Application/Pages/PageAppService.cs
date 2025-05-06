@@ -29,6 +29,7 @@ public class PageAppService : ApplicationService, IPageAppService
         _slugHelper = slugHelper;
     }
 
+    [AllowAnonymous]
     public async Task<PageDto> GetAsync(Guid id)
     {
         try
@@ -177,6 +178,7 @@ public class PageAppService : ApplicationService, IPageAppService
         return ObjectMapper.Map<Page, PageDto>(page);
     }
 
+    [AllowAnonymous]
     public async Task<PageDto?> GetHomePageAsync()
     {
         var page = await _pageRepository.FirstOrDefaultAsync(p => p.IsHomePage);
