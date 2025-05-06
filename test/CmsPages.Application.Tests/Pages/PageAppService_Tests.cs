@@ -430,4 +430,125 @@ public abstract class PageAppService_Tests<TStartupModule> : CmsPagesApplication
         Assert.Equal(CmsPagesDomainErrorCodes.PageUpdateFailedExistingRoute, exception.Code);
     }
 
+    [Fact]
+    public async Task Should_Filter_By_Title()
+    {
+        // Arrange
+        var titleToSearch = "My"; // we expect to get only 1 page - the one with title "My Page"
+
+        // Act
+        var result = await _pageAppService.GetListAsync(new PageFilterDto
+        {
+            Title = titleToSearch,
+            MaxResultCount = 10
+        });
+
+        // Assert
+        result.Items.ShouldNotBeEmpty();
+        result.Items.All(p => p.Title.Contains(titleToSearch, StringComparison.InvariantCultureIgnoreCase)).ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task Should_Filter_By_RouteName()
+    {
+        // Arrange
+        var routeToSearch = "another"; // we expect to get only 1 page - the one with route name "another-page"
+
+        // Act
+        var result = await _pageAppService.GetListAsync(new PageFilterDto
+        {
+            RouteName = routeToSearch,
+            MaxResultCount = 10
+        });
+
+        // Assert
+        result.Items.ShouldNotBeEmpty();
+        result.Items.All(p => p.RouteName.Contains(routeToSearch, StringComparison.InvariantCultureIgnoreCase)).ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task Should_Return_Empty_If_No_Match()
+    {
+        var result = await _pageAppService.GetListAsync(new PageFilterDto
+        {
+            Title = "NonExistentTitleXYZ"
+        });
+
+        result.TotalCount.ShouldBe(0);
+        result.Items.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Should_Support_Pagination()
+    {
+        // Act
+        var result = await _pageAppService.GetListAsync(new PageFilterDto
+        {
+            MaxResultCount = 1,
+            SkipCount = 0
+        });
+
+        // Assert
+        result.Items.Count.ShouldBe(1);
+        result.TotalCount.ShouldBeGreaterThan(1); // we seed 2 entries
+    }
+
+    [Fact]
+    public async Task Should_Sort_By_Title_Ascending()
+    {
+        // Arrange
+        var pages = new[]
+        {
+            new CreateUpdatePageDto { Title = "Zebra", RouteName = "zebra" },
+            new CreateUpdatePageDto { Title = "Apple", RouteName = "apple" },
+            new CreateUpdatePageDto { Title = "Monkey", RouteName = "monkey" },
+        };
+
+        foreach (var page in pages)
+        {
+            await _pageAppService.CreateAsync(page);
+        }
+
+        // Act
+        var result = await _pageAppService.GetListAsync(new PageFilterDto
+        {
+            Sorting = "Title",
+            MaxResultCount = 10
+        });
+
+        // Assert
+        var sorted = result.Items.Select(p => p.Title).ToList();
+        sorted.ShouldBe(new[] { "Another Page", "Apple", "Monkey", "My Page", "Zebra" }); // in this case it also includes the 2 pre-seeded pages
+    }
+
+    [Fact]
+    public async Task Should_Sort_By_Title_Descending()
+    {
+        // Arrange
+        var pages = new[]
+        {
+            new CreateUpdatePageDto { Title = "Zebra", RouteName = "zebra" },
+            new CreateUpdatePageDto { Title = "Apple", RouteName = "apple" },
+            new CreateUpdatePageDto { Title = "Monkey", RouteName = "monkey" },
+        };
+
+        foreach (var page in pages)
+        {
+            await _pageAppService.CreateAsync(page);
+        }
+
+        // Act
+        var result = await _pageAppService.GetListAsync(new PageFilterDto
+        {
+            Sorting = "Title DESC",
+            MaxResultCount = 10
+        });
+
+        // Assert
+        var sorted = result.Items.Select(p => p.Title).ToList();
+        var manuallySorted = sorted.OrderByDescending(t => t).ToList();
+
+        sorted.ShouldBe(manuallySorted);
+    }
+
 }
