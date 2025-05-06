@@ -330,11 +330,7 @@ public class CmsPagesBlazorModule : AbpModule
         app.UseAuditing();
         app.UseAbpSerilogEnrichers();
 
-        app.MapWhen(ctx => ctx.Request.Path.StartsWithSegments("/swagger"), appBuilder =>
-        {
-            appBuilder.UseRouting();
-            appBuilder.UseEndpoints(endpoints => { }); // No-op. We do this to avoid Blazor routing taking over
-        });
+        app.UseStatusCodePagesWithRedirects("/404");
 
         app.UseConfiguredEndpoints(builder =>
         {

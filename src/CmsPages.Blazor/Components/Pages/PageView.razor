@@ -22,7 +22,7 @@
             var page = await PageAppService.GetByRouteNameAsync(RouteName);
             if (page == null)
             {
-                NavigationManager.NavigateTo("/not-found");
+                NavigationManager.NavigateTo("/404");
                 return;
             }
 
@@ -32,7 +32,7 @@
         catch (Exception exception)
         {
             Console.Error.WriteLine($"An error occurred while loading the page: {exception.Message}");
-            NavigationManager.NavigateTo("/not-found");
+            NavigationManager.NavigateTo("/404");
         }
     }
 }
