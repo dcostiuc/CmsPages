@@ -1,0 +1,38 @@
+@page "/pages/{RouteName}"
+@using CmsPages.Pages
+@inject IPageAppService PageAppService
+@inject NavigationManager NavigationManager
+
+<h1 class="title">@Title</h1>
+
+<div class="page-content">
+    @((MarkupString)Content)
+</div>
+@code {
+    [Parameter]
+    public string RouteName { get; set; }
+    private string Title;
+    private string Content;
+
+    [AllowAnonymous]
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            var page = await PageAppService.GetByRouteNameAsync(RouteName);
+            if (page == null)
+            {
+                NavigationManager.NavigateTo("/404");
+                return;
+            }
+
+            Title = page.Title;
+            Content = page.Content;
+        }
+        catch (Exception exception)
+        {
+            Console.Error.WriteLine($"An error occurred while loading the page: {exception.Message}");
+            NavigationManager.NavigateTo("/404");
+        }
+    }
+}

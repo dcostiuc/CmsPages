@@ -4,6 +4,7 @@ using CmsPages.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace CmsPages.Migrations
 {
     [DbContext(typeof(CmsPagesDbContext))]
-    partial class CmsPagesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250505030648_Added_Unique_Index_On_RouteName_and_max_length")]
+    partial class Added_Unique_Index_On_RouteName_and_max_length
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,7 +40,6 @@ namespace CmsPages.Migrations
                         .HasColumnName("ConcurrencyStamp");
 
                     b.Property<string>("Content")
-                        .HasMaxLength(65535)
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreationTime")
@@ -82,10 +84,6 @@ namespace CmsPages.Migrations
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
-
-                    b.Property<Guid?>("TenantId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("TenantId");
 
                     b.Property<string>("Title")
                         .IsRequired()

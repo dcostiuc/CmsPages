@@ -8,7 +8,6 @@ public class CmsPagesBlazorAutoMapperProfile : Profile
     public CmsPagesBlazorAutoMapperProfile()
     {
         CreateMap<PageDto, CreateUpdatePageDto>();
-
-        //Define your AutoMapper configuration here for the Blazor project.
+        CreateMap<Page, PageDto>();
     }
 }

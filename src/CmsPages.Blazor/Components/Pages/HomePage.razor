@@ -1,0 +1,32 @@
+@page "/"
+@using CmsPages.Pages
+@inject NavigationManager NavigationManager
+@inject IPageAppService PageAppService
+@inherits CmsPagesComponentBase
+
+@if (_homePageFound)
+{
+    NavigationManager.NavigateTo($"/pages/{_homePageRouteName}");
+}
+else
+{
+    <h1>CMS Pages</h1>
+    <h3>Welcome to the CMS Pages app.</h3>
+    <p>This is the default home page because no CMS page is currently set as the home page.</p>
+    <p>If a home page was previously set, it may have been deleted.</p>
+}
+
+@code {
+    private bool _homePageFound = false;
+    private string? _homePageRouteName;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var homePage = await PageAppService.GetHomePageAsync();
+        if (homePage != null)
+        {
+            _homePageFound = true;
+            _homePageRouteName = homePage.RouteName;
+        }
+    }
+}

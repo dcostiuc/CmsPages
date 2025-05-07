@@ -9,7 +9,8 @@
 @using Volo.Abp.AspNetCore.Components.Web
 @inject IStringLocalizer<CmsPagesResource> L
 @inject AbpBlazorMessageLocalizerHelper<CmsPagesResource> LH
-@inherits AbpCrudPageBase<IPageAppService, PageDto, Guid, PagedAndSortedResultRequestDto, CreateUpdatePageDto>
+@inject PageAppService PageAppService
+@inherits AbpCrudPageBase<IPageAppService, PageDto, Guid, PageFilterDto, CreateUpdatePageDto>
 
 <Card>
     <CardHeader>
@@ -26,10 +27,10 @@
         </Row>
     </CardHeader>
     <CardBody>
-        <DataGrid TItem="PageDto" Data="Entities" ReadData="OnDataGridReadAsync" CurrentPage="CurrentPage"
-            TotalItems="TotalCount" ShowPager="true" PageSize="PageSize">
+        <DataGrid TItem="PageDto" Filterable="true" Data="Entities" ReadData="OnDataGridReadAsync"
+            CurrentPage="CurrentPage" TotalItems="TotalCount" ShowPager="true" PageSize="PageSize">
             <DataGridColumns>
-                <DataGridEntityActionsColumn TItem="PageDto" @ref="@EntityActionsColumn">
+                <DataGridEntityActionsColumn TItem="PageDto" @ref="@EntityActionsColumn" Filterable="false">
                     <DisplayTemplate>
                         <EntityActions TItem="PageDto" EntityActionsColumn="@EntityActionsColumn">
                             <EntityAction TItem="PageDto" Text="@L["Edit"]" Visible=HasUpdatePermission
@@ -43,9 +44,11 @@
                 <DataGridColumn TItem="PageDto" Field="@nameof(PageDto.Title)" Caption="@L["Title"]"></DataGridColumn>
                 <DataGridColumn TItem="PageDto" Field="@nameof(PageDto.RouteName)" Caption="@L["RouteName"]">
                 </DataGridColumn>
-                <DataGridColumn TItem="PageDto" Field="@nameof(PageDto.IsHomePage)" Caption="@L["IsHomePage"]">
+                <DataGridColumn TItem="PageDto" Field="@nameof(PageDto.IsHomePage)" Filterable="false"
+                    Caption="@L["IsHomePage"]">
                 </DataGridColumn>
-                <DataGridColumn TItem="PageDto" Field="@nameof(PageDto.CreationTime)" Caption="@L["CreationTime"]">
+                <DataGridColumn TItem="PageDto" Field="@nameof(PageDto.CreationTime)" Filterable="false"
+                    Caption="@L["CreationTime"]">
                     <DisplayTemplate>
                         @context.CreationTime.ToLongDateString()
                     </DisplayTemplate>
@@ -87,12 +90,25 @@
                     </Validation>
                     <Field>
                         <FieldLabel>@L["Content"]</FieldLabel>
-                        <TextEdit @bind-Text="@NewEntity.Content"></TextEdit>
+                        <RichTextEdit @ref="@CreateContentEditor" />
                     </Field>
                     <Field>
-                        <FieldLabel>@L["IsHomePage"]</FieldLabel>
-                        <Check TValue="bool" @bind-Checked="@NewEntity.IsHomePage" />
+                        <div class="d-flex align-items-center gap-2">
+                            <label for="isMarkdownCheckboxCreate" class="form-check-label mb-0">
+                                @L["IsMarkdownFormatted"]
+                            </label>
+                            <Check TValue="bool" Id="isMarkdownCheckboxCreate" @bind-Checked="IsMarkdown" />
+                        </div>
                     </Field>
+                    <Field>
+                        <div class="d-flex align-items-center gap-2">
+                            <label for="isHomePageCheckboxCreate"
+                                class="form-check-label mb-0">@L["SetToHomePage"]</label>
+                            <Check TValue="bool" Id="isHomePageCheckboxCreate" @bind-Checked="@NewEntity.IsHomePage" />
+                        </div>
+                    </Field>
+
+
                 </Validations>
             </ModalBody>
             <ModalFooter>
@@ -136,12 +152,26 @@
                     </Validation>
                     <Field>
                         <FieldLabel>@L["Content"]</FieldLabel>
-                        <TextEdit @bind-Text="@EditingEntity.Content"></TextEdit>
+                        <RichTextEdit @ref="@EditContentEditor" />
                     </Field>
                     <Field>
-                        <FieldLabel>@L["IsHomePage"]</FieldLabel>
-                        <Check TValue="bool" @bind-Checked="@EditingEntity.IsHomePage" />
+                        <div class="d-flex align-items-center gap-2">
+                            <label for="isMarkdownCheckboxEdit" class="form-check-label mb-0">
+                                @L["IsMarkdownFormatted"]
+                            </label>
+                            <Check TValue="bool" Id="isMarkdownCheckboxEdit" @bind-Checked="IsMarkdown" />
+                        </div>
                     </Field>
+                    <Field>
+                        <div class="d-flex align-items-center gap-2">
+                            <label for="isHomePageCheckboxEdit"
+                                class="form-check-label mb-0">@L["SetToHomePage"]</label>
+                            <Check TValue="bool" Id="isHomePageCheckboxEdit"
+                                @bind-Checked="@EditingEntity.IsHomePage" />
+                        </div>
+                    </Field>
+
+
                 </Validations>
             </ModalBody>
             <ModalFooter>
@@ -154,7 +184,112 @@
 </Modal>
 @code
 {
-    public Pages() // Constructor
+    private RichTextEdit CreateContentEditor;
+    private RichTextEdit EditContentEditor;
+    private bool IsMarkdown;
+
+    protected override Task UpdateGetListInputAsync()
+    {
+        if (GetListInput is ISortedResultRequest sorted)
+        {
+            sorted.Sorting = CurrentSorting;
+        }
+
+        if (GetListInput is IPagedResultRequest paged)
+        {
+            paged.SkipCount = (CurrentPage - 1) * PageSize;
+        }
+
+        if (GetListInput is ILimitedResultRequest limited)
+        {
+            limited.MaxResultCount = PageSize;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    protected override Task OnDataGridReadAsync(DataGridReadDataEventArgs<PageDto> e)
+    {
+        var titleColumn = e.Columns.FirstOrDefault(c => c.SearchValue != null && c.Field == nameof(PageDto.Title));
+        GetListInput.Title = titleColumn?.SearchValue?.ToString() ?? string.Empty;
+
+        var routeNameColumn = e.Columns.FirstOrDefault(c => c.SearchValue != null && c.Field == nameof(PageDto.RouteName));
+        GetListInput.RouteName = routeNameColumn?.SearchValue?.ToString() ?? string.Empty;
+
+        return base.OnDataGridReadAsync(e);
+    }
+
+    protected override async Task CreateEntityAsync()
+    {
+        string rawInput;
+        if (IsMarkdown)
+        {
+            var rawMarkdown = await CreateContentEditor.GetTextAsync();
+            var html = PageAppService.ConvertMarkdownToHtml(rawMarkdown);
+            NewEntity.Content = PageAppService.GetDecodedAndSanitizedPageContentAsync(html);
+        }
+        else
+        {
+            rawInput = await CreateContentEditor.GetHtmlAsync();
+            // Sanitize HTML before saving
+            NewEntity.Content = PageAppService.GetDecodedAndSanitizedPageContentAsync(rawInput);
+        }
+
+        await base.CreateEntityAsync();
+    }
+
+    protected override async Task UpdateEntityAsync()
+    {
+        string rawInput;
+        if (IsMarkdown)
+        {
+            var rawMarkdown = await EditContentEditor.GetTextAsync();
+            var html = PageAppService.ConvertMarkdownToHtml(rawMarkdown);
+            EditingEntity.Content = PageAppService.GetDecodedAndSanitizedPageContentAsync(html);
+
+        }
+        else
+        {
+            rawInput = await EditContentEditor.GetHtmlAsync();
+            // Sanitize HTML before saving
+            EditingEntity.Content = PageAppService.GetDecodedAndSanitizedPageContentAsync(rawInput);
+
+        }
+        await base.UpdateEntityAsync();
+    }
+
+    protected override async Task OpenCreateModalAsync()
+    {
+        await base.OpenCreateModalAsync();
+
+        if (CreateContentEditor != null)
+        {
+            await CreateContentEditor.SetHtmlAsync(string.Empty);
+        }
+    }
+
+    protected override async Task OpenEditModalAsync(PageDto entity)
+    {
+        await base.OpenEditModalAsync(entity);
+
+        await InvokeAsync(async () =>
+        {
+            if (EditContentEditor != null)
+            {
+                await EditContentEditor.SetHtmlAsync(EditingEntity?.Content ?? string.Empty);
+            }
+        });
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await CreateContentEditor.SetHtmlAsync(NewEntity?.Content ?? string.Empty);
+        }
+    }
+
+    public Pages()
     {
         CreatePolicyName = CmsPagesPermissions.Pages.Create;
         UpdatePolicyName = CmsPagesPermissions.Pages.Edit;

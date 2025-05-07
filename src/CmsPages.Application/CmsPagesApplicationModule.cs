@@ -6,6 +6,8 @@ using Volo.Abp.AutoMapper;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Modularity;
 using Volo.Abp.TenantManagement;
+using Microsoft.Extensions.DependencyInjection;
+using CmsPages.Helpers;
 
 namespace CmsPages;
 
@@ -27,5 +29,7 @@ public class CmsPagesApplicationModule : AbpModule
         {
             options.AddMaps<CmsPagesApplicationModule>();
         });
+
+        context.Services.AddTransient<ISlugHelper, SlugHelper>();
     }
 }

@@ -33,7 +33,8 @@ namespace CmsPages;
     typeof(AbpIdentityDomainModule),
     typeof(AbpOpenIddictDomainModule),
     typeof(AbpTenantManagementDomainModule),
-    typeof(BlobStoringDatabaseDomainModule)
+    typeof(BlobStoringDatabaseDomainModule),
+    typeof(AbpMultiTenancyModule)
     )]
 public class CmsPagesDomainModule : AbpModule
 {
@@ -65,7 +66,7 @@ public class CmsPagesDomainModule : AbpModule
             options.Languages.Add(new LanguageInfo("es", "es", "Español"));
             options.Languages.Add(new LanguageInfo("sv", "sv", "Svenska"));
         });
-        
+
 
 #if DEBUG
         context.Services.Replace(ServiceDescriptor.Singleton<IEmailSender, NullEmailSender>());

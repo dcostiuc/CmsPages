@@ -51,6 +51,7 @@ using Volo.Abp.UI.Navigation;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
 using Volo.Abp.Studio.Client.AspNetCore;
+using Blazorise.RichTextEdit;
 
 namespace CmsPages.Blazor;
 
@@ -242,7 +243,8 @@ public class CmsPagesBlazorModule : AbpModule
     {
         context.Services
             .AddBootstrap5Providers()
-            .AddFontAwesomeIcons();
+            .AddFontAwesomeIcons()
+            .AddBlazoriseRichTextEdit();
     }
 
     private void ConfigureMenu(ServiceConfigurationContext context)
@@ -327,6 +329,9 @@ public class CmsPagesBlazorModule : AbpModule
         });
         app.UseAuditing();
         app.UseAbpSerilogEnrichers();
+
+        app.UseStatusCodePagesWithRedirects("/404");
+
         app.UseConfiguredEndpoints(builder =>
         {
             builder.MapRazorComponents<App>()

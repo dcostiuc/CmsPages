@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CmsPages.Domain.Shared\CmsPages.Domain.Shared.csproj" />
+    <ProjectReference Include="..\CmsPages.Application.Contracts\CmsPages.Application.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
