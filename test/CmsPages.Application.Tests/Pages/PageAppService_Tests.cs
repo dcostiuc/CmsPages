@@ -551,4 +551,35 @@ public abstract class PageAppService_Tests<TStartupModule> : CmsPagesApplication
         sorted.ShouldBe(manuallySorted);
     }
 
+    [Fact]
+    public void Should_Convert_Markdown_To_Html()
+    {
+        // Arrange
+        var markdown = "# Hello World\nThis is a *test*.";
+
+        // Act
+        var result = _pageAppService.ConvertMarkdownToHtml(markdown);
+
+        // Assert
+        result.ShouldContain("<h1", Case.Insensitive); // check there's an h1
+        result.ShouldContain("Hello World", Case.Insensitive);
+        result.ShouldContain("<p>This is a <em>test</em>.</p>", Case.Insensitive);
+    }
+
+
+    [Fact]
+    public void Should_Sanitize_Html()
+    {
+        // Arrange
+        var html = "<script>alert('xss')</script><div>Safe content</div>";
+
+        // Act
+        var result = _pageAppService.SanitizeHtml(html);
+
+        // Assert
+        result.ShouldContain("Safe content");
+        result.ShouldNotContain("<script>");
+        result.ShouldNotContain("alert");
+    }
+
 }

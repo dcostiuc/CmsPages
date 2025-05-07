@@ -16,5 +16,7 @@ public interface IPageAppService :
     Task<PageDto?> GetByRouteNameAsync(string routeName);
     Task<PageDto?> GetHomePageAsync();
     public string DecodeHtmlContent(string encodedContent);
+    public string SanitizeHtml(string htmlContent);
     public string GetDecodedAndSanitizedPageContentAsync(string encodedContent);
+    public string ConvertMarkdownToHtml(string markdownContent);
 }
