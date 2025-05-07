@@ -113,9 +113,6 @@ public class PageAppService : ApplicationService, IPageAppService
                 await UnsetOtherHomePageAsync();
             }
 
-            // Convert Markdown to HTML
-            input.Content = ConvertMarkdownToHtml(input.Content);
-
             var page = ObjectMapper.Map<CreateUpdatePageDto, Page>(input);
             await _pageRepository.InsertAsync(page);
             return ObjectMapper.Map<Page, PageDto>(page);
