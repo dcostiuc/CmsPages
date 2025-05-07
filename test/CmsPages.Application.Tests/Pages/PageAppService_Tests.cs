@@ -582,4 +582,61 @@ public abstract class PageAppService_Tests<TStartupModule> : CmsPagesApplication
         result.ShouldNotContain("alert");
     }
 
+    [Fact]
+    public async Task Should_Preserve_Encoded_Html_Content_As_Is()
+    {
+        // Arrange
+        var encodedHtml = "&lt;div&gt;Encoded &amp; Bold&lt;/div&gt;";
+
+        var createDto = new CreateUpdatePageDto
+        {
+            Title = "Encoded HTML Test",
+            RouteName = "encoded-html-test",
+            Content = encodedHtml,
+            IsHomePage = false
+        };
+
+        // Act
+        var createdPage = await _pageAppService.CreateAsync(createDto);
+        var retrievedPage = await _pageAppService.GetAsync(createdPage.Id);
+
+        // Assert
+        createdPage.Content.ShouldBe(encodedHtml);
+        retrievedPage.Content.ShouldBe(encodedHtml);
+    }
+
+    [Fact]
+    public async Task Should_Update_And_Retrieve_Exact_Html_Content()
+    {
+        // Arrange
+        var originalContent = "<p>Initial <strong>content</strong>.</p>";
+
+        var createDto = new CreateUpdatePageDto
+        {
+            Title = "Update Test Page",
+            RouteName = "update-test-page",
+            Content = originalContent,
+            IsHomePage = false
+        };
+
+        var createdPage = await _pageAppService.CreateAsync(createDto);
+
+        // Act
+        var updatedContent = "<div>Updated <em>HTML</em> content.</div>";
+
+        var updateDto = new CreateUpdatePageDto
+        {
+            Title = createdPage.Title,
+            RouteName = createdPage.RouteName,
+            Content = updatedContent,
+            IsHomePage = createdPage.IsHomePage
+        };
+
+        await _pageAppService.UpdateAsync(createdPage.Id, updateDto);
+
+        // Assert
+        var retrievedPage = await _pageAppService.GetAsync(createdPage.Id);
+        retrievedPage.Content.ShouldBe(updatedContent);
+    }
+
 }
