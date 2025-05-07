@@ -45,7 +45,7 @@
                 <DataGridColumn TItem="PageDto" Field="@nameof(PageDto.RouteName)" Caption="@L["RouteName"]">
                 </DataGridColumn>
                 <DataGridColumn TItem="PageDto" Field="@nameof(PageDto.IsHomePage)" Filterable="false"
-                    Caption="@L["IsHomePage"]"> 
+                    Caption="@L["IsHomePage"]">
                 </DataGridColumn>
                 <DataGridColumn TItem="PageDto" Field="@nameof(PageDto.CreationTime)" Filterable="false"
                     Caption="@L["CreationTime"]">
@@ -90,7 +90,15 @@
                     </Validation>
                     <Field>
                         <FieldLabel>@L["Content"]</FieldLabel>
-                        <RichTextEdit @ref="@createContentEditor" />
+                        <RichTextEdit @ref="@CreateContentEditor" />
+                    </Field>
+                    <Field>
+                        <div class="d-flex align-items-center gap-2">
+                            <label for="isMarkdownCheckboxCreate" class="form-check-label mb-0">
+                                @L["IsMarkdownFormatted"]
+                            </label>
+                            <Check TValue="bool" Id="isMarkdownCheckboxCreate" @bind-Checked="IsMarkdown" />
+                        </div>
                     </Field>
                     <Field>
                         <div class="d-flex align-items-center gap-2">
@@ -148,6 +156,14 @@
                     </Field>
                     <Field>
                         <div class="d-flex align-items-center gap-2">
+                            <label for="isMarkdownCheckboxEdit" class="form-check-label mb-0">
+                                @L["IsMarkdownFormatted"]
+                            </label>
+                            <Check TValue="bool" Id="isMarkdownCheckboxEdit" @bind-Checked="IsMarkdown" />
+                        </div>
+                    </Field>
+                    <Field>
+                        <div class="d-flex align-items-center gap-2">
                             <label for="isHomePageCheckboxEdit"
                                 class="form-check-label mb-0">@L["SetToHomePage"]</label>
                             <Check TValue="bool" Id="isHomePageCheckboxEdit"
@@ -168,8 +184,9 @@
 </Modal>
 @code
 {
-    private RichTextEdit createContentEditor;
+    private RichTextEdit CreateContentEditor;
     private RichTextEdit EditContentEditor;
+    private bool IsMarkdown;
 
     protected override Task UpdateGetListInputAsync()
     {
@@ -204,19 +221,40 @@
 
     protected override async Task CreateEntityAsync()
     {
-        var rawContent = await createContentEditor.GetHtmlAsync();
-
-        NewEntity.Content = PageAppService.GetDecodedAndSanitizedPageContentAsync(rawContent);
+        string rawInput;
+        if (IsMarkdown)
+        {
+            var rawMarkdown = await CreateContentEditor.GetTextAsync();
+            var html = PageAppService.ConvertMarkdownToHtml(rawMarkdown);
+            NewEntity.Content = PageAppService.GetDecodedAndSanitizedPageContentAsync(html);
+        }
+        else
+        {
+            rawInput = await CreateContentEditor.GetHtmlAsync();
+            // Sanitize HTML before saving
+            NewEntity.Content = PageAppService.GetDecodedAndSanitizedPageContentAsync(rawInput);
+        }
 
         await base.CreateEntityAsync();
     }
 
     protected override async Task UpdateEntityAsync()
     {
-        var rawContent = await EditContentEditor.GetHtmlAsync();
+        string rawInput;
+        if (IsMarkdown)
+        {
+            var rawMarkdown = await EditContentEditor.GetTextAsync();
+            var html = PageAppService.ConvertMarkdownToHtml(rawMarkdown);
+            EditingEntity.Content = PageAppService.GetDecodedAndSanitizedPageContentAsync(html);
 
-        EditingEntity.Content = PageAppService.GetDecodedAndSanitizedPageContentAsync(rawContent);
+        }
+        else
+        {
+            rawInput = await EditContentEditor.GetHtmlAsync();
+            // Sanitize HTML before saving
+            EditingEntity.Content = PageAppService.GetDecodedAndSanitizedPageContentAsync(rawInput);
 
+        }
         await base.UpdateEntityAsync();
     }
 
@@ -224,9 +262,9 @@
     {
         await base.OpenCreateModalAsync();
 
-        if (createContentEditor != null)
+        if (CreateContentEditor != null)
         {
-            await createContentEditor.SetHtmlAsync(string.Empty);
+            await CreateContentEditor.SetHtmlAsync(string.Empty);
         }
     }
 
@@ -247,7 +285,7 @@
     {
         if (firstRender)
         {
-            await createContentEditor.SetHtmlAsync(NewEntity?.Content ?? string.Empty);
+            await CreateContentEditor.SetHtmlAsync(NewEntity?.Content ?? string.Empty);
         }
     }
 

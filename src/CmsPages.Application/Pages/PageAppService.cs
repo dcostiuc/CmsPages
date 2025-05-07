@@ -14,6 +14,7 @@ using Volo.Abp.Uow;
 using CmsPages.Helpers;
 using Volo.Abp;
 using Microsoft.Extensions.Logging;
+using Markdig;
 
 namespace CmsPages.Pages;
 
@@ -87,6 +88,13 @@ public class PageAppService : ApplicationService, IPageAppService
         }
     }
 
+    public string ConvertMarkdownToHtml(string markdownContent)
+    {
+        var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+        return Markdown.ToHtml(markdownContent, pipeline);
+    }
+
+
     [Authorize(CmsPagesPermissions.Pages.Create)]
     public async Task<PageDto> CreateAsync(CreateUpdatePageDto input)
     {
@@ -104,6 +112,9 @@ public class PageAppService : ApplicationService, IPageAppService
             {
                 await UnsetOtherHomePageAsync();
             }
+
+            // Convert Markdown to HTML
+            input.Content = ConvertMarkdownToHtml(input.Content);
 
             var page = ObjectMapper.Map<CreateUpdatePageDto, Page>(input);
             await _pageRepository.InsertAsync(page);

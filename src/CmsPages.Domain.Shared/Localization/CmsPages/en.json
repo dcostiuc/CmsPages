@@ -25,6 +25,7 @@
     "Welcome": "Welcome",
     "RouteName": "Route",
     "SetToHomePage" : "Set as home page?",
-    "IsHomePage": "Is this the home page?"
+    "IsHomePage": "Is this the home page?",
+    "IsMarkdownFormatted": "Is this markdown-formatted?"
   }
 }
