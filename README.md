@@ -1,14 +1,5 @@
 ﻿# CMS Pages: a CMS Full-Stack Web App
 
-New Application Demo: https://drive.google.com/file/d/1VLdhQWTnfqgPml6YROZi7UgQ7OjfYR5C/view?usp=drive_link  
-Part 2: https://drive.google.com/file/d/1uLb2D9vqgIxCm5oREtU3YHhzZ4ZQNCv_/view?usp=sharing  
-(I realized afterwards that I went to a previously-made page that also had markdown rendered as html, but the functionality demoed is the same)
-
-New Brief Code Demo: https://drive.google.com/file/d/1jR3HVEaRubC4x62-FpUliKeoX1yZfKUt/view?usp=drive_link  
-Also all unit tests pass:
-![image](https://github.com/user-attachments/assets/84acbb9f-b6a2-49fc-8741-b98330b12b09)
-
-
 ## Description
 This project is a Content Management System (CMS) application written with the **ABP Framework**, using **ASP.NET Blazor Server** (with **Blazorise**) and **Entity Framework Core** (EF Core), as well as **Microsoft SQL Server** (and **xUnit** for unit tests).
 
@@ -31,6 +22,17 @@ The project was built on top of a layered startup solution based on Domain Drive
 - other kinds of exception handling, including relevant user error pop-ups shown when needed
 - Swagger UI (in dev environment) to test API endpoints
 - unit tests for the various functionality and logic for the above features (the tests try to be thorough but do not necessarily have 100% coverage of all features)
+
+### Demos
+New Application Demo: https://drive.google.com/file/d/1VLdhQWTnfqgPml6YROZi7UgQ7OjfYR5C/view?usp=drive_link  
+Part 2: https://drive.google.com/file/d/1uLb2D9vqgIxCm5oREtU3YHhzZ4ZQNCv_/view?usp=sharing  
+(I realized afterwards that I went to a previously-made page that also had markdown rendered as html, but the functionality demoed is the same)
+
+New Brief Code Demo: https://drive.google.com/file/d/1jR3HVEaRubC4x62-FpUliKeoX1yZfKUt/view?usp=drive_link  
+Also all unit tests pass:
+![image](https://github.com/user-attachments/assets/84acbb9f-b6a2-49fc-8741-b98330b12b09)
+
+
 
 ### Prerequisites
 
